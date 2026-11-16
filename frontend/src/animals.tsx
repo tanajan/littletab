@@ -1,0 +1,11 @@
+import type { Animal } from './lib';
+
+export function AnimalIcon({animal}: {animal: Animal}) {
+  const face = <><circle cx="24" cy="30" r="1.8" fill="#3d4936"/><circle cx="40" cy="30" r="1.8" fill="#3d4936"/></>;
+  return <svg viewBox="0 0 64 64" aria-hidden="true" className="animal-icon" fill="none" stroke="#596245" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    {animal === 'cat' && <><path d="M13 28 14 10 27 19Q32 16 37 19L50 10 51 29Q55 48 32 52 9 49 13 28Z" fill="var(--fur, #e4b772)"/><path d="m18 17 6 6-7 3m29-9-6 6 7 3" fill="var(--fur-light, #f0cf9b)" stroke="none"/>{face}<path d="m29 36 3 3 3-3Z" fill="#9d7059"/><path d="M32 39v3m0-1q-5 4-8-1m8 1q5 4 8-1M10 35l11 2M10 41l10-1m34-5-11 2m11 4-10-1"/><path d="m27 20 2 5m8-5-2 5"/></>}
+    {animal === 'capybara' && <><circle cx="16" cy="20" r="6" fill="var(--fur-shade, #bfa17c)"/><circle cx="45" cy="20" r="6" fill="var(--fur-shade, #bfa17c)"/><path d="M12 30Q12 15 30 17q21-1 22 17l1 10q-3 10-23 9Q10 53 10 42Z" fill="var(--fur, #cdb38f)"/><path d="M19 35q13-7 26 0v8q-12 9-26 0Z" fill="var(--fur-light, #dcc7a5)" stroke="none"/>{face}<ellipse cx="32" cy="37" rx="5" ry="3" fill="#695e48"/><path d="M27 44q5 3 10 0"/><path d="M14 19v3m31-3v3"/></>}
+    {animal === 'dog' && <><path d="M21 17Q9 12 7 31q-2 14 9 12l8-18m16-8q14-6 17 13 3 16-8 14l-9-20" fill="var(--fur-shade, #9b795b)"/><path d="M17 28q0-14 15-14t16 15v11q-2 14-16 14T17 40Z" fill="var(--fur, #e5c596)"/><path d="M33 16q15 1 14 16-9 5-13-5Z" fill="var(--fur-shade, #bb9972)" stroke="none"/>{face}<ellipse cx="32" cy="40" rx="13" ry="9" fill="var(--fur-light, #f0dbb9)" stroke="none"/><path d="m27 37 5 4 5-4q-5-4-10 0Z" fill="#5b5644"/><path d="M32 41v5m0-1q-5 3-8-1m8 1q5 3 8-1"/></>}
+    {animal === 'chameleon' && <><path d="M43 39q17-3 13 10-3 8-10 3-5-5 1-7" stroke="var(--fur-shade, #7c9b5f)" strokeWidth="7"/><path d="M11 30q0-9 10-14l6-7 7 9q14 2 15 13 1 15-18 17T11 30Z" fill="var(--fur, #a6bb7f)"/><path d="m19 16 8-7 7 9" fill="var(--fur-shade, #83a56b)"/><circle cx="20" cy="29" r="8" fill="var(--fur-light, #c9d6a8)"/><circle cx="38" cy="29" r="8" fill="var(--fur-light, #c9d6a8)"/>{face}<path d="M24 40q8 5 15-2m-16 9-2 6m17-7 3 7"/><path d="M8 36h9"/><path d="M13 21q2-7 8-8" stroke="var(--fur-light, #b8ca90)"/></>}
+  </svg>;
+}

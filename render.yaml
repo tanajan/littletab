@@ -1,0 +1,16 @@
+# Free web service + an external Neon Free PostgreSQL database.
+# Create the Neon Free project first, then supply its URL when Render prompts.
+# No database or paid compute service is created by this Blueprint.
+services:
+  - type: web
+    name: littletab
+    runtime: docker
+    region: frankfurt
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: DATABASE_URL
+        sync: false
