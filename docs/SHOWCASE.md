@@ -8,7 +8,7 @@ Description:
 
 Topics: `react`, `typescript`, `fastapi`, `postgresql`, `bill-splitting`, `expense-tracker`, `neon`.
 
-Set the Website field to the verified Render URL after deployment. Keep the repository private until you choose to publish its source; a demo website can run from a private repository.
+The GitHub description, topics and Website field have been applied. The verified demo URL is https://littletab.onrender.com. Keep the repository private until you choose to publish its source; a demo website can run from a private repository.
 
 ## Screenshots and demo
 

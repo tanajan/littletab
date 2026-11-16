@@ -2,7 +2,7 @@
 
 Use **Render Free for the app** and **Neon Free for PostgreSQL**. The existing React/TypeScript + FastAPI + PostgreSQL stack stays the same. The root Dockerfile builds the frontend and serves it from FastAPI, so you only need one web service.
 
-The existing demo is hosted at https://littletab.onrender.com on a Render Free Docker web service in Frankfurt. The transaction-date release (`986bc56`) is live; newer local changes still need to be pushed and manually deployed. The homepage and `/api/health` both returned HTTP 200 during verification on 16 November 2026.
+The existing demo is hosted at https://littletab.onrender.com on a Render Free Docker web service in Frankfurt. Release `6f959da` is live, including receipt printing, expense search and pagination. The homepage and `/api/health` both returned HTTP 200 during verification on 16 November 2026.
 
 These services can cost nothing while you remain within their free allowances; free hosting is not unlimited or always awake.
 
@@ -54,4 +54,4 @@ Open http://127.0.0.1:8080. This uses local PostgreSQL and remains local-only. `
 
 ## Verification status
 
-The production frontend build and API tests have passed locally. Deployment YAML is checked for a Free web plan and no Render database resources. The running app has now passed a live Neon PostgreSQL smoke test. Render reports the existing Docker deployment as live, and its homepage and API health endpoint returned HTTP 200. Newer local changes have not been deployed.
+The production frontend build and API tests have passed locally. Deployment YAML is checked for a Free web plan and no Render database resources. The running app has now passed a live Neon PostgreSQL smoke test. Render reports the existing Docker deployment as live, and its homepage and API health endpoint returned HTTP 200. The live create/join/save flow and direct Neon persistence check passed, and the verification room was deleted. Deployed JavaScript and CSS match the locally verified build.

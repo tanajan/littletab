@@ -6,8 +6,6 @@ An account-free expense splitter for trips, dinners, and shared moments. Create 
 
 [Try the live demo](https://littletab.onrender.com) · Choose **Try a sample room** to explore without saving data.
 
-The hosted demo currently runs the transaction-date release; the receipt animation and searchable, paginated expense table described below are available in this checkout and await deployment.
-
 ## Screenshots
 
 Desktop expense list with colourful profiles and search:
