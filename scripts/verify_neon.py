@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 import sys
 import uuid
+from datetime import date, datetime
 from urllib.parse import urlsplit
 import httpx
 import psycopg
@@ -38,15 +39,17 @@ try:
             assert response.status_code==200
             room=response.json()['room'];host_id=room['people'][0]['id']
             print('Join room and choose a new person: 200')
-            item={'id':uuid.uuid4().hex,'name':'Verification dinner','amount':3001,'paidBy':host_id,'participants':[p['id'] for p in room['people']],'allocations':{host_id:1000}}
+            item={'id':uuid.uuid4().hex,'name':'Verification dinner','amount':3001,'paidBy':host_id,'participants':[p['id'] for p in room['people']],'allocations':{host_id:1000},'expenseDate':date.today().isoformat()}
             room['items']=[item]
             response=client.put(f'/api/rooms/{code}',json=room,headers=headers)
             assert response.status_code==200
             response=client.get(f'/api/rooms/{code}',headers=host_headers)
             assert response.status_code==200 and response.json()['items'][0]['allocations']=={host_id:1000}
-            print('Save and reload custom-split expense: 200')
+            assert response.json()['items'][0]['expenseDate']==item['expenseDate']
+            assert datetime.fromisoformat(response.json()['items'][0]['createdAt'].replace('Z','+00:00')).tzinfo is not None
+            print('Save and reload dated custom-split expense: 200')
             saved=connection.execute('SELECT data FROM rooms WHERE code=%s',(code,)).fetchone()[0]
-            assert saved['name']==name and saved['items'][0]['id']==item['id'] and saved['items'][0]['amount']==3001
+            assert saved['name']==name and saved['items'][0]['id']==item['id'] and saved['items'][0]['amount']==3001 and saved['items'][0]['expenseDate']==item['expenseDate'] and saved['items'][0]['createdAt']
             print('Direct Neon persistence check: OK')
         finally:
             if created:

@@ -73,3 +73,16 @@ describe('playful repeated animals',()=>{
     expect(animalFor({name:'Legacy name'})).toBe(animalFor({name:'Legacy name'}));
   });
 });
+
+import {todayDate,formatExpenseDate} from './lib';
+describe('expense calendar dates',()=>{
+  it('uses the local day for the default, including just after midnight',()=>{
+    expect(todayDate(new Date(2026,10,16,0,5))).toBe('2026-11-16');
+    expect(todayDate(new Date(2026,0,2,23,55))).toBe('2026-01-02');
+  });
+  it('formats date-only values without shifting the calendar day',()=>{
+    expect(formatExpenseDate('2026-11-16')).toBe('16 Nov 2026');
+    expect(formatExpenseDate(null)).toBe('');
+    expect(formatExpenseDate('2026-02-30')).toBe('');
+  });
+});

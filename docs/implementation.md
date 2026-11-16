@@ -50,3 +50,9 @@ Validation: 10 API tests, 4 calculation tests, and a production build pass. Brow
 - Invitations now have a visible URL and Copy link action. Fixed restore behaviour so an invitation’s room code takes priority over a session for a different room. PINs are not put in URLs.
 - Added a root multi-stage Dockerfile, local production Compose file, Render Blueprint and deployment guide. FastAPI serves the built React app and API together; Render database URL schemes are normalized for psycopg.
 - Verification: production build, 10 calculation/colour tests and 14 API tests pass. Production root, invite query path and JS asset serving are covered. Current UI/browser automation is unavailable, so the newest visual controls remain for manual browser review. Docker is not installed, and no hosted deployment has been attempted.
+
+## Optional expense date
+
+Added a date-only input defaulting to the browser’s local calendar day on new expenses, with date display beside the payer and in read-only receipt images. Editing older undated items does not invent a date. Server validation accepts valid dates or null and stamps new expenses with an immutable UTC creation timestamp; existing creation timestamps cannot be changed by a client. Legacy items keep unknown timestamps. Serialization uses JSON mode for date/datetime values.
+
+Validation: production build, 15 frontend tests, and 19 backend tests pass. A temporary-room live Neon verification saved and reloaded the chosen date and server timestamp, confirmed both directly in Postgres, and deleted the verification room. No existing expenses were changed by verification. New date-input layout has not been checked in a live browser in this session.

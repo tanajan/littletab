@@ -184,3 +184,39 @@ def test_production_frontend_and_invite_path_share_the_api_origin(client):
     script=re.search(r'src="([^"]+\.js)"',page.text).group(1)
     assert client.get(script).status_code==200
     assert client.get('/api/health').json()=={'status':'ok'}
+
+def test_expense_dates_and_server_creation_time(client):
+    from datetime import datetime, timezone
+    host=create(client);data=host['room'];code=data['code'];person=data['people'][0]['id']
+    started=datetime.now(timezone.utc)
+    data['items']=[{'id':'dated-dinner','name':'Dinner','amount':2000,'paidBy':person,'participants':[person],'expenseDate':'2026-11-15','createdAt':'2000-01-01T00:00:00Z'}]
+    response=client.put(f'/api/rooms/{code}',json=data,headers=auth(host))
+    assert response.status_code==200,response.text
+    data=response.json();item=data['items'][0];created=item['createdAt']
+    assert item['expenseDate']=='2026-11-15'
+    assert datetime.fromisoformat(created.replace('Z','+00:00'))>=started
+    item['expenseDate']='2026-11-14';item['createdAt']='2001-01-01T00:00:00Z'
+    response=client.put(f'/api/rooms/{code}',json=data,headers=auth(host))
+    assert response.status_code==200,response.text
+    data=response.json()
+    assert data['items'][0]['createdAt']==created
+    assert data['items'][0]['expenseDate']=='2026-11-14'
+    data['items'][0]['expenseDate']='2026-02-30'
+    assert client.put(f'/api/rooms/{code}',json=data,headers=auth(host)).status_code==422
+    data['items'][0]['expenseDate']=None
+    response=client.put(f'/api/rooms/{code}',json=data,headers=auth(host))
+    assert response.status_code==200
+    assert response.json()['items'][0]['expenseDate'] is None
+    assert response.json()['items'][0]['createdAt']==created
+
+def test_legacy_items_do_not_gain_invented_dates_or_times(client):
+    host=create(client);data=host['room'];code=data['code'];person=data['people'][0]['id']
+    data['items']=[{'id':'legacy','name':'Old dinner','amount':1000,'paidBy':person,'participants':[person]}]
+    with Session.begin() as db:
+        stored=db.get(Room,code)
+        stored.data={key:data[key] for key in ['name','currency','people','items']}
+    data['items'][0]['createdAt']='2000-01-01T00:00:00Z'
+    response=client.put(f'/api/rooms/{code}',json=data,headers=auth(host))
+    assert response.status_code==200,response.text
+    assert response.json()['items'][0]['expenseDate'] is None
+    assert response.json()['items'][0]['createdAt'] is None

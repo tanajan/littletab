@@ -12,10 +12,21 @@ export function animalTone(people: Person[], personId: string, override?: Animal
   const matching=people.filter(p=>(p.id===personId?animal:animalFor(p))===animal);
   return Math.max(0,matching.findIndex(p=>p.id===personId))%6;
 }
-export type Item = { id: string; name: string; amount: number; paidBy: string; participants: string[]; allocations?: Record<string, number> };
+export type Item = { id: string; name: string; amount: number; paidBy: string; participants: string[]; allocations?: Record<string, number>; expenseDate?: string | null; createdAt?: string | null };
 export type Room = { code: string; name: string; currency: string; people: Person[]; items: Item[]; version: number; expiresAt: string };
 export type Session = { room: Room; token: string; ownerToken?: string; personId?: string };
 export const money = (cents: number, currency: string) => new Intl.NumberFormat('en-GB', { style: 'currency', currency }).format(cents / 100);
+/** Calendar dates use the user's local day, not a UTC conversion. */
+export function todayDate(value = new Date()): string {
+  return `${value.getFullYear()}-${String(value.getMonth()+1).padStart(2,'0')}-${String(value.getDate()).padStart(2,'0')}`;
+}
+export function formatExpenseDate(value?: string | null): string {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
+  const [year,month,day]=value.split('-').map(Number);
+  const date=new Date(year,month-1,day,12);
+  if(date.getFullYear()!==year || date.getMonth()!==month-1 || date.getDate()!==day) return '';
+  return new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric'}).format(date);
+}
 export function splitItem(item: Item): Record<string, number> {
   const fixed = item.allocations || {};
   if (!item.participants.length || Object.keys(fixed).some(id => !item.participants.includes(id))) throw new Error('Choose valid participants for every amount.');

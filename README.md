@@ -106,3 +106,7 @@ Install backend requirements into `.venv` and frontend dependencies with `npm ci
 For a live Neon smoke test, start the app on port 8011 (`$env:PORT='8011'; npm start`) and run `.\.venv\Scripts\python.exe scripts/verify_neon.py` in another terminal. The script creates and deletes only its own temporary verification room and confirms its saved expense directly in Neon. Never run the regular pytest suite against the production Neon database: that suite recreates test tables.
 
 See [the verified Neon setup report](docs/NEON_SETUP.md) for command results and remaining hosting steps.
+
+## Expense dates
+
+New expenses have an optional calendar date, defaulting to today in the user’s local timezone. Clear the date if it is unknown. Dates appear beneath expense names and in receipt images; exact transaction times are not requested. Existing undated expenses stay undated unless edited explicitly. The server records a UTC `createdAt` timestamp for newly added expense IDs and preserves it on edits. Legacy expenses retain an unknown creation time. Both fields live in existing room JSON, so no database schema migration is needed.

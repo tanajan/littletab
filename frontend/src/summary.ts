@@ -1,4 +1,4 @@
-import { calculate, money, type Room } from './lib';
+import { calculate, money, formatExpenseDate, type Room } from './lib';
 
 /** Local, read-only receipt snapshots. Paginate rather than truncate long item lists. */
 export async function summaryImages(room: Room): Promise<Blob[]> {
@@ -50,7 +50,7 @@ export async function summaryImages(room: Room): Promise<Blob[]> {
     await ensure(height);rule(y);y+=17;
     rows.forEach((row,i)=>text(row,72,y+i*31,24));text(money(item.amount,room.currency),1128,y,25,ink,'right',260);y+=rows.length*31+7;
     const payer=room.people.find(p=>p.id===item.paidBy)?.name || 'Unknown';
-    text(`Paid by ${payer} · ${item.participants.length} sharing · ${Object.keys(item.allocations||{}).length?'Custom amounts':'Equal split'}`,72,y,18,muted);y+=34;
+    text(`Paid by ${payer}${item.expenseDate ? ` · ${formatExpenseDate(item.expenseDate)}` : ''} · ${item.participants.length} sharing · ${Object.keys(item.allocations||{}).length?'Custom amounts':'Equal split'}`,72,y,18,muted);y+=34;
   }
   y+=24;await section('EVERYONE’S SHARE',200);
   function headings(){text('PERSON',72,y,16,muted);text('PAID',624,y,16,muted,'right');text('SHARE',865,y,16,muted,'right');text('BALANCE',1128,y,16,muted,'right');y+=34;}

@@ -9,14 +9,14 @@ import re
 import secrets
 from pathlib import Path
 from contextlib import asynccontextmanager, suppress
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Annotated, Literal
 
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from storage_migration import default_database_url
-from pydantic import BaseModel, Field, model_validator
+from pydantic import AwareDatetime, BaseModel, Field, model_validator
 from sqlalchemy import JSON, DateTime, Integer, String, create_engine, delete, select, update
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
@@ -147,6 +147,8 @@ class Item(BaseModel):
     name: str = Field(min_length=1, max_length=100)
     amount: int = Field(gt=0, le=100_000_000)
     paidBy: str
+    expenseDate: date | None = None
+    createdAt: AwareDatetime | None = None
     participants: list[str] = Field(min_length=1, max_length=100)
     allocations: dict[str, Annotated[int, Field(ge=0, le=100_000_000, strict=True)]] = Field(default_factory=dict)
 
@@ -282,7 +284,12 @@ def identify_person(code: str, body: IdentifyPerson, authorization: Annotated[st
 def save_room(code: str, body: RoomData, authorization: Annotated[str | None, Header()] = None):
     with Session.begin() as db:
         room = authorize(db, code, authorization)
-        data = body.model_dump(exclude={"version"})
+        data = body.model_dump(mode="json", exclude={"version"})
+        previous_items = {item["id"]: item for item in room.data["items"]}
+        for item in data["items"]:
+            previous = previous_items.get(item["id"])
+            # Preserve original timestamps, including unknown times on legacy items.
+            item["createdAt"] = previous.get("createdAt") if previous is not None else utcnow().isoformat()
         result = db.execute(update(Room).where(Room.code == code, Room.version == body.version).values(data=data, version=body.version+1).returning(Room.code))
         if result.scalar_one_or_none() is None:
             raise HTTPException(409, "Someone updated this room. The latest version has been loaded; please try again.")
