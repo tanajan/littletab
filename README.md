@@ -89,3 +89,20 @@ The default `render.yaml` now uses one Render **Free** web service and asks for 
 Active configuration, browser keys and local database names use `littletab`. Existing browser data migrates once on startup; the previous prefix is retained only in the migration helper for compatibility. The local room database is renamed once on API startup, preserving the file contents. If Windows reports the previous database is locked, stop the old API first and restart it. Migration never overwrites an existing database. Generated dependency files and historical screenshots are not application configuration.
 
 If you already use a PostgreSQL database, its existing connection URL remains valid through `DATABASE_URL`. The Compose database/role names apply to a fresh volume; changing those environment variables does not rename an existing database. Keep using the previous database URL until you explicitly migrate an existing PostgreSQL instance.
+
+## Neon CLI setup
+
+This checkout is linked to the selected Neon project and its production branch. The CLI-created `.neon` link and `.env.local` database credentials stay ignored by Git. `neon.ts` declares Postgres only. For this Python/FastAPI server, SQLAlchemy uses the installed native psycopg driver. FastAPI reads `.env` first, then `.env.local`, without replacing explicit environment variables.
+
+From the repository root:
+
+```powershell
+npm run build
+npm start
+```
+
+Install backend requirements into `.venv` and frontend dependencies with `npm ci --prefix frontend` on a new checkout. `npm start` serves the built React app and API together at http://127.0.0.1:8000. Without a configured database URL, local SQLite remains available. Local SQLite rooms are not automatically copied into Neon.
+
+For a live Neon smoke test, start the app on port 8011 (`$env:PORT='8011'; npm start`) and run `.\.venv\Scripts\python.exe scripts/verify_neon.py` in another terminal. The script creates and deletes only its own temporary verification room and confirms its saved expense directly in Neon. Never run the regular pytest suite against the production Neon database: that suite recreates test tables.
+
+See [the verified Neon setup report](docs/NEON_SETUP.md) for command results and remaining hosting steps.

@@ -1,0 +1,11 @@
+import {spawn} from 'node:child_process';
+import {existsSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
+import {join} from 'node:path';
+const root=fileURLToPath(new URL('../',import.meta.url));
+const localPython=join(root,'.venv',process.platform==='win32'?'Scripts':'bin',process.platform==='win32'?'python.exe':'python');
+const python=process.env.PYTHON || (existsSync(localPython)?localPython:'python');
+const child=spawn(python,['-m','uvicorn','app:app','--app-dir','backend','--host',process.env.HOST||'127.0.0.1','--port',process.env.PORT||'8000'],{cwd:root,stdio:'inherit',env:process.env});
+child.on('error',()=>{process.stderr.write('Could not start Python. Install backend requirements in .venv, or set PYTHON to your Python executable.\n');process.exitCode=1;});
+child.on('exit',code=>{process.exitCode=code??0;});
+for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>child.kill(signal));

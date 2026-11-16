@@ -4,7 +4,11 @@ Use **Render Free for the app** and **Neon Free for PostgreSQL**. The existing R
 
 Nothing has been published. These services can cost nothing while you remain within their free allowances; free hosting is not unlimited or always awake.
 
-## 1. Create the free database
+## Existing Neon setup in this checkout
+
+The requested Neon CLI initialization and deployment have completed for project `sparkling-credit-18845372`, branch `production`, with Postgres as the only utilized service. You do not need to create another Neon database. Its credentials were pulled into ignored `.env.local`; copy `DATABASE_URL` from there into Render when prompted. Never push that file to GitHub. The updated code and configuration still need to be pushed before Render can build them. See [the setup report](NEON_SETUP.md).
+
+## 1. Create the free database (for a new setup only)
 
 1. Sign up at [Neon](https://neon.com/) and create a project on its **Free** plan. Pick a European region near Frankfurt if available.
 2. Open **Connect** and copy the PostgreSQL connection string. Copy just the URL beginning `postgresql://`, not a surrounding `psql` command. Keep its SSL query parameters, such as `sslmode=require`.
@@ -48,4 +52,4 @@ Open http://127.0.0.1:8080. This uses local PostgreSQL and remains local-only. `
 
 ## Verification status
 
-The production frontend build and API tests have passed locally. Deployment YAML is checked for a Free web plan and no Render database resources. No Render or Neon account has been created or changed by this chat. Docker and live hosted PostgreSQL execution have not been tested on this machine.
+The production frontend build and API tests have passed locally. Deployment YAML is checked for a Free web plan and no Render database resources. No Render or Neon account has been created or changed by this chat. The running app has now passed a live Neon PostgreSQL smoke test. Docker image execution and the Render deployment itself have not been tested on this machine.

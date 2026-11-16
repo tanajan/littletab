@@ -14,12 +14,17 @@ from typing import Annotated, Literal
 
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.staticfiles import StaticFiles
+from dotenv import load_dotenv
 from storage_migration import default_database_url
 from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import JSON, DateTime, Integer, String, create_engine, delete, select, update
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 
+# Neon CLI writes .env when present, otherwise .env.local. Real process env wins.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(PROJECT_ROOT / '.env', override=False)
+load_dotenv(PROJECT_ROOT / '.env.local', override=False)
 DATABASE_URL = os.environ.get("DATABASE_URL") or default_database_url()
 if DATABASE_URL.startswith(("postgres://", "postgresql://")):
     DATABASE_URL = "postgresql+psycopg://" + DATABASE_URL.split("://", 1)[1]
@@ -231,9 +236,9 @@ def join_room(code: str, body: JoinRoom):
         from sqlalchemy.dialects.sqlite import insert as sqlite_insert
         insert = sqlite_insert if engine.dialect.name == "sqlite" else pg_insert
         statement = insert(Attempt).values(code=code, count=1, reset_at=utcnow()+timedelta(minutes=15))
-        statement = statement.on_conflict_do_update(index_elements=[Attempt.code], set_={"count": Attempt.count+1}, where=Attempt.count < 10)
-        result = db.execute(statement)
-        if result.rowcount != 1:
+        statement = statement.on_conflict_do_update(index_elements=[Attempt.code], set_={"count": Attempt.count+1}, where=Attempt.count < 10).returning(Attempt.code)
+        accepted = db.execute(statement).scalar_one_or_none()
+        if accepted is None:
             raise HTTPException(429, "Too many attempts. Try again in 15 minutes.")
     with Session.begin() as db:
         room = db.get(Room, code)
@@ -267,8 +272,8 @@ def identify_person(code: str, body: IdentifyPerson, authorization: Annotated[st
             raise HTTPException(422, "This room already has 100 people. Pick an existing name.")
         person_id = secrets.token_hex(8)
         data = {**room.data, "people": [*room.data["people"], {"id": person_id, "name": name, "avatar": secrets.choice(["cat", "capybara", "dog", "chameleon"])}]}
-        result = db.execute(update(Room).where(Room.code == code, Room.version == room.version).values(data=data, version=room.version+1))
-        if result.rowcount != 1:
+        result = db.execute(update(Room).where(Room.code == code, Room.version == room.version).values(data=data, version=room.version+1).returning(Room.code))
+        if result.scalar_one_or_none() is None:
             raise HTTPException(409, "The group just changed. Please try again.")
         db.refresh(room)
         return {"room": view(room), "personId": person_id}
@@ -278,8 +283,8 @@ def save_room(code: str, body: RoomData, authorization: Annotated[str | None, He
     with Session.begin() as db:
         room = authorize(db, code, authorization)
         data = body.model_dump(exclude={"version"})
-        result = db.execute(update(Room).where(Room.code == code, Room.version == body.version).values(data=data, version=body.version+1))
-        if result.rowcount != 1:
+        result = db.execute(update(Room).where(Room.code == code, Room.version == body.version).values(data=data, version=body.version+1).returning(Room.code))
+        if result.scalar_one_or_none() is None:
             raise HTTPException(409, "Someone updated this room. The latest version has been loaded; please try again.")
         db.refresh(room)
         return view(room)

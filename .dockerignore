@@ -11,3 +11,6 @@
 .env.*
 !.env.example
 docs/screenshots
+
+.neon
+.agents
