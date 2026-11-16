@@ -27,6 +27,18 @@ export function formatExpenseDate(value?: string | null): string {
   if(date.getFullYear()!==year || date.getMonth()!==month-1 || date.getDate()!==day) return '';
   return new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric'}).format(date);
 }
+/** Search names or an exact major-unit amount, then page without changing bill data. */
+export function expensePage(items: Item[], query: string, requestedPage: number, currency: string, pageSize=6) {
+  const text=query.trim().toLocaleLowerCase();
+  const numeric=text.replace(new RegExp(currency,'ig'),'').replace(/[£$€฿,\s]/g,'');
+  const isAmount=/^(?:\d+(?:\.\d{1,2})?|\.\d{1,2})$/.test(numeric);
+  const cents=isAmount?Math.round(Number(numeric)*100):null;
+  const matched=text?items.filter(item=>item.name.toLocaleLowerCase().includes(text)||(cents!==null&&item.amount===cents)):items;
+  const pageCount=Math.max(1,Math.ceil(matched.length/pageSize));
+  const page=Math.max(1,Math.min(requestedPage,pageCount));
+  const start=(page-1)*pageSize;
+  return {items:matched.slice(start,start+pageSize),matchedCount:matched.length,pageCount,page,start:matched.length?start+1:0,end:Math.min(start+pageSize,matched.length),total:matched.reduce((sum,item)=>sum+item.amount,0)};
+}
 export function splitItem(item: Item): Record<string, number> {
   const fixed = item.allocations || {};
   if (!item.participants.length || Object.keys(fixed).some(id => !item.participants.includes(id))) throw new Error('Choose valid participants for every amount.');

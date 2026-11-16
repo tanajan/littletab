@@ -2,11 +2,13 @@
 
 Use **Render Free for the app** and **Neon Free for PostgreSQL**. The existing React/TypeScript + FastAPI + PostgreSQL stack stays the same. The root Dockerfile builds the frontend and serves it from FastAPI, so you only need one web service.
 
-Nothing has been published. These services can cost nothing while you remain within their free allowances; free hosting is not unlimited or always awake.
+The existing demo is hosted at https://littletab.onrender.com on a Render Free Docker web service in Frankfurt. The transaction-date release (`986bc56`) is live; newer local changes still need to be pushed and manually deployed. The homepage and `/api/health` both returned HTTP 200 during verification on 16 November 2026.
+
+These services can cost nothing while you remain within their free allowances; free hosting is not unlimited or always awake.
 
 ## Existing Neon setup in this checkout
 
-The requested Neon CLI initialization and deployment have completed for project `sparkling-credit-18845372`, branch `production`, with Postgres as the only utilized service. You do not need to create another Neon database. Its credentials were pulled into ignored `.env.local`; copy `DATABASE_URL` from there into Render when prompted. Never push that file to GitHub. The updated code and configuration still need to be pushed before Render can build them. See [the setup report](NEON_SETUP.md).
+The requested Neon CLI initialization and deployment have completed for the selected project and production branch, with Postgres as the only utilized service. You do not need to create another Neon database. Its credentials were pulled into ignored `.env.local`; copy `DATABASE_URL` from there into Render when prompted. Never push that file to GitHub. The updated code and configuration still need to be pushed before Render can build them. See [the setup report](NEON_SETUP.md).
 
 ## 1. Create the free database (for a new setup only)
 
@@ -18,7 +20,7 @@ The requested Neon CLI initialization and deployment have completed for project 
 
 ## 2. Put the project in GitHub
 
-Create a **private GitHub repository** and push this project. Include the root `Dockerfile`, `render.yaml`, `frontend`, and `backend`. The supplied `.gitignore` excludes `.env` files, local databases, dependencies and the Python environment. Do not upload those excluded files manually.
+Create a GitHub repository (private is fine) and push this project. Include the root `Dockerfile`, `render.yaml`, `frontend`, and `backend`. The supplied `.gitignore` excludes `.env` files, local databases, dependencies and the Python environment. Do not upload those excluded files manually.
 
 ## 3. Deploy the free app
 
@@ -52,4 +54,4 @@ Open http://127.0.0.1:8080. This uses local PostgreSQL and remains local-only. `
 
 ## Verification status
 
-The production frontend build and API tests have passed locally. Deployment YAML is checked for a Free web plan and no Render database resources. No Render or Neon account has been created or changed by this chat. The running app has now passed a live Neon PostgreSQL smoke test. Docker image execution and the Render deployment itself have not been tested on this machine.
+The production frontend build and API tests have passed locally. Deployment YAML is checked for a Free web plan and no Render database resources. The running app has now passed a live Neon PostgreSQL smoke test. Render reports the existing Docker deployment as live, and its homepage and API health endpoint returned HTTP 200. Newer local changes have not been deployed.

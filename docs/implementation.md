@@ -56,3 +56,11 @@ Validation: 10 API tests, 4 calculation tests, and a production build pass. Brow
 Added a date-only input defaulting to the browser’s local calendar day on new expenses, with date display beside the payer and in read-only receipt images. Editing older undated items does not invent a date. Server validation accepts valid dates or null and stamps new expenses with an immutable UTC creation timestamp; existing creation timestamps cannot be changed by a client. Legacy items keep unknown timestamps. Serialization uses JSON mode for date/datetime values.
 
 Validation: production build, 15 frontend tests, and 19 backend tests pass. A temporary-room live Neon verification saved and reloaded the chosen date and server timestamp, confirmed both directly in Postgres, and deleted the verification room. No existing expenses were changed by verification. New date-input layout has not been checked in a live browser in this session.
+
+## Receipt printing and expense browsing
+
+Added a printer-style receipt reveal with preparation status, a skip action, reduced-motion handling and cancellation protection while images are generated. Closing a pending preview cannot reopen it; object URLs are released when the preview closes.
+
+Extracted an expense table component with six-row pagination, jump-to-page selection, name/exact-amount search, empty-result feedback and matching subtotal. Full balances and receipt generation still use the unfiltered room data. Pagination is clamped when entries are removed and search resets to page one. The Invite friends action is larger and full-width on phones.
+
+Validation: production build, 19 frontend tests and 19 API tests pass. New pagination/search tests cover partial names, duplicate exact prices, currency/thousands formatting, last pages, deletion clamping, empty matches and unchanged settlements. A live browser visual check of the new animation and layout remains pending; no browser automation tool is available in this session.

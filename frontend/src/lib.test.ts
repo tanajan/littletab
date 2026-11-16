@@ -86,3 +86,30 @@ describe('expense calendar dates',()=>{
     expect(formatExpenseDate('2026-02-30')).toBe('');
   });
 });
+
+import {expensePage} from './lib';
+describe('expense search and pagination',()=>{
+  const entries=Array.from({length:17},(_,index)=>({id:String(index),name:index===0?'Coffee':index===1?'Coffee refill':`Expense ${index+1}`,amount:index<2?1250:index===2?11250:index===3?123450:100*(index+1),paidBy:'a',participants:['a']}));
+  it('shows six rows, preserves order and includes the final partial page',()=>{
+    const first=expensePage(entries,'',1,'GBP');const last=expensePage(entries,'',3,'GBP');
+    expect(first.items.map(item=>item.id)).toEqual(['0','1','2','3','4','5']);
+    expect(first.pageCount).toBe(3);
+    expect(last.items).toHaveLength(5);expect(last.start).toBe(13);expect(last.end).toBe(17);
+    expect(expensePage(entries.slice(0,6),'',3,'GBP').page).toBe(1);
+  });
+  it('finds partial names regardless of case or surrounding whitespace',()=>{
+    const result=expensePage(entries,'  COFFEE ',3,'GBP');
+    expect(result.matchedCount).toBe(2);expect(result.page).toBe(1);expect(result.items.map(item=>item.id)).toEqual(['0','1']);
+  });
+  it('finds duplicate exact amounts without matching larger prices',()=>{
+    for(const query of ['12.50','12.5','£12.50','GBP 12.50']) expect(expensePage(entries,query,1,'GBP').items.map(item=>item.id)).toEqual(['0','1']);
+    expect(expensePage(entries,'£1,234.50',1,'GBP').items.map(item=>item.id)).toEqual(['3']);
+  });
+  it('handles no results without changing original expenses or settlement totals',()=>{
+    const r={...room(1000),items:entries};const before=calculate(r);
+    const result=expensePage(entries,'not on this bill',2,'GBP');
+    expect(result.items).toEqual([]);expect(result.matchedCount).toBe(0);expect(result.start).toBe(0);expect(result.end).toBe(0);expect(result.page).toBe(1);
+    expect(calculate(r)).toEqual(before);expect(entries).toHaveLength(17);
+    expect(expensePage(entries,'coffee',1,'GBP').total).toBe(2500);
+  });
+});

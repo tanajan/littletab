@@ -1,6 +1,6 @@
 # Verified Neon setup
 
-Target: organization `org-quiet-king-01546148`, project `sparkling-credit-18845372`, branch `production` (`br-plain-leaf-bejy59x6`). No new paid plan, app authentication service, or website publication was requested or performed.
+Target: the locally linked Neon project and production branch. No new paid plan, app authentication service, or website publication was requested or performed.
 
 ## Changes
 
@@ -16,14 +16,14 @@ Target: organization `org-quiet-king-01546148`, project `sparkling-credit-188453
 
 ```text
 npx --yes neon@latest config plan
-→ Planning against branch production (br-plain-leaf-bejy59x6)
+→ Planning against branch production
 Utilized services: Postgres
 No changes — branch production already matches the policy.
 ```
 
 ```text
 npx --yes neon@latest deploy
-→ Applying to branch production (br-plain-leaf-bejy59x6)
+→ Applying to branch production
 No changes — branch production already matches the policy.
 Utilized services: Postgres
 Pulled 5 Neon variables into .env.local
